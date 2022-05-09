@@ -43,17 +43,12 @@ def getreviews(idx):
     return rrows
 
 
-def getallrows(ordr, lat, lng):
+def getallrows(ordr):
     oder = getorder(ordr)
     con = sqlite3.connect("farm.db")
     con.row_factory = sqlite3.Row
     cur = con.cursor()
-    cur.execute(f"SELECT farms.id,Zip,MarketName,State,City,AVR,\
-                ROUND(((cos(sin(({lat}*pi()/180)) * sin((x*pi()/180)) +\
-                cos(({lat}*pi()/180))* cos((x*pi()/180))* cos((({lng}- y)*pi()/180)))) * 180/pi()) * 60 * 1.1515) DISTANCE\
-                FROM farms\
-                LEFT OUTER JOIN (SELECT farm_id, ROUND(AVG(rating),1) AVR FROM reviews GROUP BY farm_id) r\
-                ON farms.id=r.farm_id {oder}")
+    cur.execute(f"SELECT * FROM mainview {oder}")
     rows = cur.fetchall()
     con.close()
     return rows
@@ -91,7 +86,7 @@ def getorder(orrd):
     return oder
 
 
-def getselrows(zp, st, ct, ordr, lat, lng, dist):
+def getselrows(zp, st, ct, ordr, dist):
     oder = getorder(ordr)
     con = sqlite3.connect("farm.db")
     con.row_factory = sqlite3.Row
@@ -113,12 +108,7 @@ def getselrows(zp, st, ct, ordr, lat, lng, dist):
     else:
         ct = f"'{ct}'"
     cur.execute(
-        f"SELECT farms.id,Zip,MarketName,State,City,AVR,\
-                ROUND(((cos(sin(({lat}*pi()/180)) * sin((x*pi()/180)) +\
-                cos(({lat}*pi()/180))* cos((x*pi()/180))* cos((({lng}- y)*pi()/180)))) * 180/pi()) * 60 * 1.1515) DISTANCE\
-                FROM farms\
-                LEFT OUTER JOIN (SELECT farm_id, ROUND(AVG(rating),1) AVR FROM reviews GROUP BY farm_id) r\
-                ON farms.id=r.farm_id where Zip = {zp} and lower(State) = lower({st}) and lower(City) = lower({ct}) and DISTANCE <= {dist} {oder}")
+        f"SELECT * FROM mainview where Zip = {zp} and lower(State) = lower({st}) and lower(City) = lower({ct}) and DISTANCE <= {dist} {oder}")
     rows = cur.fetchall()
     con.close()
     return rows
@@ -137,7 +127,7 @@ def reset(ordr=3):
     dist = int
     x = -94.551136
     y = 39.125212
-    rows = getallrows(ordr, x, y)
+    rows = getallrows(ordr)
     page = int(request.args.get('page', 1))
     per_page = 18
     offset = (page - 1) * per_page
@@ -163,7 +153,7 @@ def index(ordr=3):
         zp = request.form["zp"]
         st = request.form["st"]
         ct = request.form["ct"]
-        rows = getselrows(zp, st, ct, ordr, x, y, dist)
+        rows = getselrows(zp, st, ct, ordr, dist)
         page = int(request.args.get('page', 1))
         per_page = 18
         offset = (page - 1) * per_page
@@ -174,9 +164,9 @@ def index(ordr=3):
 
     else:
         if not post:
-            rows = getallrows(ordr, x, y)
+            rows = getallrows(ordr)
         elif post:
-            rows = getselrows(zp, st, ct, ordr, x, y, dist)
+            rows = getselrows(zp, st, ct, ordr, dist)
         page = int(request.args.get('page', 1))
         per_page = 18
         offset = (page - 1) * per_page
