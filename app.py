@@ -49,7 +49,7 @@ def getallrows(ordr, lat, lng):
     con.row_factory = sqlite3.Row
     cur = con.cursor()
     cur.execute(f"SELECT farms.id,Zip,MarketName,State,City,AVR,\
-                ROUND(((acos(sin(({lat}*pi()/180)) * sin((x*pi()/180)) +\
+                ROUND(((cos(sin(({lat}*pi()/180)) * sin((x*pi()/180)) +\
                 cos(({lat}*pi()/180))* cos((x*pi()/180))* cos((({lng}- y)*pi()/180)))) * 180/pi()) * 60 * 1.1515) DISTANCE\
                 FROM farms\
                 LEFT OUTER JOIN (SELECT farm_id, ROUND(AVG(rating),1) AVR FROM reviews GROUP BY farm_id) r\
@@ -114,7 +114,7 @@ def getselrows(zp, st, ct, ordr, lat, lng, dist):
         ct = f"'{ct}'"
     cur.execute(
         f"SELECT farms.id,Zip,MarketName,State,City,AVR,\
-                ROUND(((acos(sin(({lat}*pi()/180)) * sin((x*pi()/180)) +\
+                ROUND(((cos(sin(({lat}*pi()/180)) * sin((x*pi()/180)) +\
                 cos(({lat}*pi()/180))* cos((x*pi()/180))* cos((({lng}- y)*pi()/180)))) * 180/pi()) * 60 * 1.1515) DISTANCE\
                 FROM farms\
                 LEFT OUTER JOIN (SELECT farm_id, ROUND(AVG(rating),1) AVR FROM reviews GROUP BY farm_id) r\
