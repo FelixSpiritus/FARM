@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, url_for
 from flask_paginate import Pagination, get_page_args
 import sqlite3
-from flask import Flask
+
 
 app = Flask(__name__)
 
@@ -217,4 +217,4 @@ def deletemarket(idx):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
