@@ -108,7 +108,7 @@ def getselrows(zp, st, ct, ordr, dist):
     else:
         ct = f"'{ct}'"
     cur.execute(
-        f"SELECT * FROM mainview where Zip = {zp} and lower(State) = lower({st}) and lower(City) = lower({ct}) and DISTANCE <= {dist} {oder}")
+        f"SELECT * FROM mainview where Zip = {zp} and lower(State) = lower({st}) and lower(City) = lower({ct}) and Distance <= {dist} {oder}")
     rows = cur.fetchall()
     con.close()
     return rows
